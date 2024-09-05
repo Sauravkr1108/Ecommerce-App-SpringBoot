@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{base::layout(~{::section})}">
+<head>
+    <meta charset="UTF-8">
+    <title>Products</title>
+</head>
+<body>
+    <section>
+        <div class="container mt-5 p-3">
+            <div class="row">
+                <div class="col-md-1 mt-4">
+                    <a th:href="@{'/admin/'}" class="text-success"><i class="fa-solid fa-circle-left fa-2x mt-3"></i></a>
+                </div>
+                <div class="col-md-11 mt-3">
+                    <div class="card">
+                        <div class="card-header text-center">
+                            <p class="fs-4">View Products</p>
+                                <th:block th:if="${session.succDel}">
+                                    <p class="text-success fw-bold">[[${session.succDel}]]</p>
+                                    <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+                                </th:block>
+                                <th:block th:if="${session.errDel}">
+                                    <p class="text-success fw-bold">[[${session.errDel}]]</p>
+                                    <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+                                </th:block>
+                            <div class="row">
+                                <div class="col-md-9">
+                                    <form action="/admin/search-product" method="get">
+                                        <div class="input-group mb-3" style="width:400px;">
+                                            <input type="text" class="form-control" placeholder="Search products" name="search">
+                                            <button class="btn btn-info" >Search</button>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="btn-group dropend">
+                                        <button type="button" class="btn btn-info" disabled>Category</button>
+                                        <button type="button" class="btn btn-info dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <span class="visually-hidden">Toggle Dropend</span>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a href="/admin/products" th:classappend="${paramValue == '' ? 'active' : ''}" class="dropdown-item">
+                                                    View All
+                                                </a>
+                                            </li>
+                                            <li th:each="category : ${categories}">
+                                                <a class="dropdown-item"
+                                                   th:href="@{'/admin/filter-products?category='+${category.categoryName}}">[[${category.categoryName}]]
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <table class="table">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">SI No.</th>
+                                        <th scope="col">Image</th>
+                                        <th scope="col">Title</th>
+                                        <th scope="col">Category</th>
+                                        <th scope="col">Stock</th>
+                                        <th scope="col">Price</th>
+                                        <th scope="col">Discount</th>
+                                        <th scope="col">Discounted Price</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="product,i : ${products}">
+                                        <th scope="row">[[${i.count}]]</th>
+                                        <td>
+<!--                                            <img th:src="@{'/static/img/product_img/'+${product.image}}" alt="" height="70px" width="70px">-->
+                                            <img th:src="${product.image}" alt="" height="70px" width="70px">
+                                        </td>
+                                        <td>[[${product.title}]]</td>
+                                        <td>[[${product.category}]]</td>
+                                        <td>[[${product.stock}]]</td>
+                                        <td>&#8377 [[${product.price}]]</td>
+                                        <td>[[${product.discount}]] %</td>
+                                        <td class="fw-bold">&#8377 [[${product.discountPrice}]]</td>
+                                        <td>
+                                            <th:block th:if="${product.isActive}">Available</th:block>
+                                            <th:block th:unless="${product.isActive}">Not Available</th:block>
+                                        </td>
+                                        <td>
+                                            <a th:href="@{'/admin/editProduct/'+${product.id}}" class="btn btn-primary btn-sm"><i class="fa-solid fa-pen-to-square"></i> Edit </a>
+                                            <a th:href="@{'/admin/deleteProduct/'+${product.id}}" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash-can"></i> Delete </a>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <th:block th:unless="${totalElements > 0 or totalProducts > 0}">
+                                    <p class="fs-6 text-center mt-4 text-danger">No product found</p>
+                                </th:block>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-5 text-secondary">
+                            <th:block th:if="${totalElements > 0}">
+                                Total Products : [[${totalElements}]]
+                            </th:block>
+                            <th:block th:if="${totalProducts > 0}">
+                                Total Products : [[${totalProducts}]]
+                            </th:block>
+                        </div>
+                        <div class="col-md-7 text-center">
+                            <th:block th:if="${totalElements>0}">
+                                <nav aria-label="Page navigation example">
+                                    <ul class="pagination">
+                                        <li class="page-item" th:classappend="${isFirst} ? 'disabled' : ''">
+                                            <a class="page-link" th:href="@{'/admin/products?pageNo='+${pageNo-1}}" aria-label="Previous">
+                                                <span aria-hidden="true">&laquo;</span>
+                                            </a>
+                                        </li>
+                                        <li th:each="i:${#numbers.sequence(1, totalPages)}" class="page-item" th:classappend="${pageNo+1==i} ? 'active' : ''">
+                                            <a class="page-link" th:href="@{'/admin/products?pageNo='+${i-1}}">[[${i}]]</a>
+                                        </li>
+                                        <li class="page-item" th:classappend="${isLast} ? 'disabled' : ''">
+                                            <a class="page-link" th:href="@{'/admin/products?pageNo='+${pageNo+1}}" aria-label="Next">
+                                                <span aria-hidden="true">&raquo;</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </th:block>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

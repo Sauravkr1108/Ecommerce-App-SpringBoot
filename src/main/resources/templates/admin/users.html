@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{base::layout(~{::section})}">
+<head>
+    <meta charset="UTF-8">
+    <title>Products</title>
+</head>
+<body>
+<section>
+    <div class="container mt-5 p-3">
+        <div class="row">
+            <div class="col-md-1 mt-4">
+                <a th:href="@{'/admin/'}" class="text-success"><i class="fa-solid fa-circle-left fa-2x mt-3"></i></a>
+            </div>
+            <div class="col-md-11 mt-3">
+                <div class="card">
+                    <div class="card-header text-center">
+                        <p th:if="${userType==1}" class="fs-4">Users</p>
+                        <p th:if="${userType==2}" class="fs-4">Admins</p>
+                        <th:block th:if="${session.successMsg}">
+                            <p class="text-success fw-bold">[[${session.successMsg}]]</p>
+                            <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+                        </th:block>
+                        <th:block th:if="${session.errorMsg}">
+                            <p class="text-success fw-bold">[[${session.errorMsg}]]</p>
+                            <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+                        </th:block>
+                        <div class="col-md-1">
+                            <div class="btn-group-sm dropend">
+                                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Type
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a href="/admin/users?type=1" class="dropdown-item">Users</a>
+                                    </li>
+                                    <li>
+                                        <a href="/admin/users?type=2" class="dropdown-item">Admins</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th scope="col">SI No.</th>
+                                    <th scope="col">Profile Image</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Email ID</th>
+                                    <th scope="col">Mobile</th>
+                                    <th scope="col">Address</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="user,i : ${users}">
+                                    <th scope="row">[[${i.count}]]</th>
+                                    <td>
+<!--                                        <img th:src="@{'/static/img/profile_img/'+${user.profileImage}}" alt="" height="70px" width="70px">-->
+                                        <img th:src="${user.profileImage}" alt="" height="70px" width="70px">
+                                    </td>
+                                    <td class="fw-bold">[[${user.username}]]</td>
+                                    <td>[[${user.email}]]</td>
+                                    <td>[[${user.mobileNo}]]</td>
+                                    <td>[[${user.address + ', ' + user.city + ', ' + user.state + ', ' + user.pincode}]]</td>
+                                    <td>
+                                        <th:block th:if="${user.isEnable}">Active</th:block>
+                                        <th:block th:unless="${user.isEnable}">Inactive</th:block>
+                                    </td>
+                                    <td>
+                                        <a th:href="@{'/admin/updateStatus?status=true&id='+${user.id}+'&type='+${userType}}" class="btn btn-success btn-sm">Active </a>
+                                        <a th:href="@{'/admin/updateStatus?status=false&id='+${user.id}+'&type='+${userType}}" class="btn btn-danger btn-sm">Inactive </a>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>
