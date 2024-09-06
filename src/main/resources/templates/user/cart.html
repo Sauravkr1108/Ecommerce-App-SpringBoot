@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{base::layout(~{::section})}">
+<head>
+    <meta charset="UTF-8">
+    <title>Products</title>
+</head>
+<body>
+<section>
+    <div class="container mt-5 p-3">
+        <div class="row">
+            <div class="col-md-1 mt-4">
+                <a href="/" class="text-success"><i class="fa-solid fa-circle-left fa-2x mt-3"></i></a>
+            </div>
+            <div class="col-md-11 mt-3">
+                <div class="card">
+                    <div class="card-header text-center">
+                        <p class="fs-4">Cart</p>
+                        <th:block th:if="${session.succDel}">
+                            <p class="text-success fw-bold">[[${session.succDel}]]</p>
+                            <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+                        </th:block>
+                        <th:block th:if="${session.errDel}">
+                            <p class="text-success fw-bold">[[${session.errDel}]]</p>
+                            <th:block th:text="${@commonServiceImpl.removeSessionMessage()}"></th:block>
+                        </th:block>
+                        <div class="card-body">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th scope="col">SI No.</th>
+                                    <th scope="col">Image</th>
+                                    <th scope="col">Product</th>
+                                    <th scope="col">Price</th>
+                                    <th scope="col" class="text-center">Quantity</th>
+                                    <th scope="col">Total Price</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="cart, i : ${carts}">
+                                    <th scope="row">[[${i.count}]]</th>
+                                    <td>
+<!--                                        <img th:src="@{'/static/img/product_img/'+${cart.product.image}}" alt="" height="70px" width="70px">-->
+                                        <img th:src="${cart.product.image}" alt="" height="70px" width="70px">
+                                    </td>
+                                    <td>[[${cart.product.title}]]</td>
+                                    <td>[[${cart.product.discountPrice}]]</td>
+                                    <td class="text-center">
+                                        <a th:href="@{'/user/cartQuantityUpdate?symbol=minus&cid='+${cart.id}}"><i class="fa-solid fa-minus" style="color: #d20f0f;"></i></a>
+                                        &nbsp;&nbsp;&nbsp;[[${cart.quantity}]]&nbsp;&nbsp;&nbsp;
+                                        <a th:href="@{'/user/cartQuantityUpdate?symbol=plus&cid='+${cart.id}}"><i class="fa-solid fa-plus" style="color: #00bd16;"></i></a>
+                                    </td>
+                                    <td>&#8377 [[${cart.totalPrice}]]</td>
+                                </tr>
+                                <th:block th:if="${carts.size != 0}">
+                                    <tr>
+                                        <td colspan="4"></td>
+                                        <td class="fw-bold fs-5">Total Price</td>
+                                        <td class="fw-bold text-success fs-5">&#8377 [[${totalOrderPrice}]]</td>
+                                    </tr>
+                                </th:block>
+                                </tbody>
+                            </table>
+                            <th:block th:if="${carts.size == 0}">
+                                    <p class="text-center">Cart is empty. <a href="/products">Click here to continue shopping.</a></p>
+                            </th:block>
+                            <th:block th:if="${carts.size != 0}">
+                                <a href="/user/orders" class="btn btn-warning">Proceed Payment</a>
+                            </th:block>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>
